@@ -1,0 +1,15 @@
+{% extends "learning_logs/base.html" %}
+{% block content %}
+{% if query %}
+    {% if results %}
+    <h4>{{ topic }}</h4>
+    <ul>
+    {% for item in results%}
+        <li>{{ item|escape }}</li>
+    {% endfor %}
+    </ul>
+    {% else %}
+       <p>Query returned no results.</p>
+    {% endif %}
+{% endif %} 
+{% endblock content %}

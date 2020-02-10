@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
+from django.db.models import Q
 
 
 # Create your views here.
@@ -54,6 +55,7 @@ def new_entry(request, topic_id):
     context = {'topic':topic, 'form': form}
     return render(request, 'learning_logs/new_entry.html', context)
 
+@login_required
 def edit_entry(request, entry_id):
     entry = Entry.objects.get(id=entry_id)
     topic = entry.topic
@@ -70,3 +72,27 @@ def edit_entry(request, entry_id):
     
     context = {'entry': entry, 'topic': topic, 'form': form}
     return render(request, 'learning_logs/edit_entry.html', context)
+
+@login_required
+def search_results(request):
+    query = request.GET.get('q','')
+    #The empty string handles an empty "request"
+    if query:
+            queryset = (Q(text__icontains=query))
+            #I assume "text" is a field in your model
+            #i.e., text = model.TextField()
+            #Use | if searching multiple fields, i.e., 
+            #queryset = (Q(text__icontains=query))|(Q(other__icontains=query))
+            #value = Topic.objects.filter(queryset).distinct().values("text")
+            
+            value = Topic.objects.filter(queryset).distinct().values_list("text",flat=True)
+            newValue=Topic.objects.get(text=value)
+            results = Entry.objects.filter(topic=newValue)
+            topic = newValue
+            #value = Topic.objects.filter(queryset).distinct().values()
+            #import pdb; pdb.set_trace()
+
+    else:
+       results = []
+    context = {'topic':topic,'results':results,'query':query}
+    return render(request, 'learning_logs/search_results.html', context)

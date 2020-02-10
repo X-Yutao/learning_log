@@ -20,4 +20,7 @@ urlpatterns = [
 
     #page edit entry
     url(r'^edit_entry/(?P<entry_id>\d+)/$', views.edit_entry, name='edit_entry'),
+
+    #search results
+    url(r'^search_results/$', views.search_results, name='search_results'),
 ]
